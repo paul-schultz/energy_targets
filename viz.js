@@ -11,6 +11,13 @@ var svg = d3
   .append("g")
   .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+// tooltip
+var tooltip = d3
+  .select("body")
+  .append("div")
+  .attr("class", "tooltip")
+  .style("opacity", 0);
+
 //Read data
 d3.csv("targets.csv", function (data) {
   // group data
@@ -21,7 +28,7 @@ d3.csv("targets.csv", function (data) {
     })
     .entries(data);
 
-  // Add X axis 
+  // Add X axis
   var x = d3
     .scaleLinear()
     .domain(
@@ -47,6 +54,16 @@ d3.csv("targets.csv", function (data) {
     .range([height, 0]);
   svg.append("g").call(d3.axisLeft(y));
 
+  console.log(sumstat[0].values[0].Name);
+
+  function changeColor(selection) {
+    selection.attr("stroke", "red")
+    selection.attr("z-index", 1000);
+  }
+
+  function colorDefault(selection) {
+    selection.attr("stroke", "#e4e4e4");
+  }
   // Draw the line
   svg
     .selectAll(".line")
@@ -55,7 +72,7 @@ d3.csv("targets.csv", function (data) {
     .append("path")
     .attr("fill", "none")
     .attr("stroke", "#e4e4e4")
-    .attr("stroke-width", 3)
+    .attr("stroke-width", 5)
     .attr("d", (d) => {
       return d3
         .line()
@@ -65,5 +82,17 @@ d3.csv("targets.csv", function (data) {
         .y((d) => {
           return y(+d.Value);
         })(d.values);
+    })
+    .on("mouseover", function(d) {
+      d3.select(this).transition().duration(200).call(changeColor);
+      tooltip.transition().duration(200).style("opacity", 0.9);
+      tooltip
+        .html("City: " + d.values[0].Name)
+        .style("left", d3.event.pageX + "px")
+        .style("top", d3.event.pageY + 28 + "px");
+    })
+    .on("mouseout", function(d) {
+      d3.select(this).transition().duration(200).call(colorDefault);
+      tooltip.transition().duration(500).style("opacity", 0);
     });
 });
