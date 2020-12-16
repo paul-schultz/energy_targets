@@ -29,7 +29,7 @@ d3.csv("targets.csv", function (data) {
     .entries(data);
 
   var parseTime = d3.timeParse("%Y");
-  
+
   // Add X axis
   var x = d3
     .scaleTime()
@@ -41,7 +41,7 @@ d3.csv("targets.csv", function (data) {
     .range([0, width]);
   svg
     .append("g")
-    .attr("transform", "translate(0," + height + ")") 
+    .attr("transform", "translate(0," + height + ")")
     .call(d3.axisBottom(x).ticks(1));
 
   // Add Y axis
@@ -60,31 +60,22 @@ d3.csv("targets.csv", function (data) {
     .scaleLinear()
     .domain([
       0,
-      d3.max(data, (d) => {
-        return +d.Value;
-      }),
+      d3.max(data, (d) => { return +d.Value; }),
     ])
     .range([height, 0]);
-  svg.append("g").attr("transform", "translate(" + width + ",0)").call(d3.axisRight(yRight));
-
-  console.log(sumstat);
+  svg
+    .append("g")
+    .attr("transform", "translate(" + width + ",0)")
+    .call(d3.axisRight(yRight));
 
   // Color change functions
-  function changeRed(selection) {
-    selection.attr("stroke", "#FC6042");
-  }
+  function changeRed(selection) { selection.attr("stroke", "#FC6042"); }
 
-  function changeYellow(selection) {
-    selection.attr("stroke", "#EEE657");
-  }
+  function changeYellow(selection) { selection.attr("stroke", "#EEE657"); }
 
-  function changeGreen(selection) {
-    selection.attr("stroke", "#2CC990");
-  }
+  function changeGreen(selection) { selection.attr("stroke", "#2CC990"); }
 
-  function colorDefault(selection) {
-    selection.attr("stroke", "#e4e4e4");
-  }
+  function colorDefault(selection) { selection.attr("stroke", "#e4e4e4"); }
 
   // Draw lines
   svg
@@ -94,40 +85,33 @@ d3.csv("targets.csv", function (data) {
     .append("path")
     .attr("fill", "none")
     .attr("stroke", "#e4e4e4")
-    .attr("stroke-width", 5)
+    .attr("stroke-width", 3)
     .attr("d", (d) => {
       return d3
         .line()
-        .x((d) => {
-          return x(parseTime(d.Year));
-        })
-        .y((d) => {
-          return y(+d.Value);
-        })(d.values);
+        .x((d) => { return x(parseTime(d.Year)); })
+        .y((d) => { return y(+d.Value); })(d.values);
     })
     // Tooltips
     .on("mouseover", function (d) {
-      var diff = d.values[1].Value - d.values[0].Value
-      console.log(diff)
-      if ( 60 < d.values[1].Value ) {
-        d3.select(this).transition().duration(200).call(changeGreen);
-        tooltip.transition().duration(200).style("opacity", 0.9).style("background", "#2CC990").style("color", 'white');
+      var diff = d.values[1].Value - d.values[0].Value;
+      if (60 < d.values[1].Value) {
+        d3.select(this).transition().duration(200).call(changeGreen).attr("stroke-width", 5);
+        tooltip.transition().duration(200).style("opacity", 0.9).style("background", "#2CC990").style("color", "white");
       } else if (20 <= diff && diff <= 40) {
-        d3.select(this).transition().duration(200).call(changeYellow);
-        tooltip.transition().duration(200).style("opacity", 0.9).style("background", "#EEE657").style("color", '#222');
+        d3.select(this).transition().duration(200).call(changeYellow).attr("stroke-width", 5);
+        tooltip.transition().duration(200).style("opacity", 0.9).style("background", "#EEE657").style("color", "#222");
       } else {
-        d3.select(this).transition().duration(200).call(changeRed);
-        tooltip.transition().duration(200).style("opacity", 0.9).style("background", "#FC6042").style("color", 'white');
+        d3.select(this).transition().duration(200).call(changeRed).attr("stroke-width", 5);
+        tooltip.transition().duration(200).style("opacity", 0.9).style("background", "#FC6042").style("color", "white");
       }
       tooltip
-        .html(d.values[0].Name)
+        .html( d.values[0].Name + ": " + d.values[0].Value + "% to " + d.values[1].Value + "%" )
         .style("left", d3.event.pageX + "px")
         .style("top", d3.event.pageY + 28 + "px");
     })
     .on("mouseout", function (d) {
-      d3.select(this).transition().duration(200).call(colorDefault);
+      d3.select(this).transition().duration(200).call(colorDefault).attr("stroke-width", 3);
       tooltip.transition().duration(500).style("opacity", 0);
     });
-
-    // Axis labels
 });
