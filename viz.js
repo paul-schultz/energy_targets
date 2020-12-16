@@ -28,18 +28,20 @@ d3.csv("targets.csv", function (data) {
     })
     .entries(data);
 
+  var parseTime = d3.timeParse("%Y");
+  
   // Add X axis
   var x = d3
-    .scaleLinear()
+    .scaleTime()
     .domain(
       d3.extent(data, (d) => {
-        return d.Year;
+        return parseTime(d.Year);
       })
     )
     .range([0, width]);
   svg
     .append("g")
-    .attr("transform", "translate(0," + height + ")")
+    .attr("transform", "translate(0," + height + ")") 
     .call(d3.axisBottom(x).ticks(1));
 
   // Add Y axis
@@ -54,17 +56,37 @@ d3.csv("targets.csv", function (data) {
     .range([height, 0]);
   svg.append("g").call(d3.axisLeft(y));
 
-  console.log(sumstat[0].values[0].Name);
+  var yRight = d3
+    .scaleLinear()
+    .domain([
+      0,
+      d3.max(data, (d) => {
+        return +d.Value;
+      }),
+    ])
+    .range([height, 0]);
+  svg.append("g").attr("transform", "translate(" + width + ",0)").call(d3.axisRight(yRight));
 
-  function changeColor(selection) {
-    selection.attr("stroke", "red")
-    selection.attr("z-index", 1000);
+  console.log(sumstat);
+
+  // Color change functions
+  function changeRed(selection) {
+    selection.attr("stroke", "red");
+  }
+
+  function changeYellow(selection) {
+    selection.attr("stroke", "yellow");
+  }
+
+  function changeGreen(selection) {
+    selection.attr("stroke", "green");
   }
 
   function colorDefault(selection) {
     selection.attr("stroke", "#e4e4e4");
   }
-  // Draw the line
+
+  // Draw lines
   svg
     .selectAll(".line")
     .data(sumstat)
@@ -77,21 +99,32 @@ d3.csv("targets.csv", function (data) {
       return d3
         .line()
         .x((d) => {
-          return x(d.Year);
+          return x(parseTime(d.Year));
         })
         .y((d) => {
           return y(+d.Value);
         })(d.values);
     })
-    .on("mouseover", function(d) {
-      d3.select(this).transition().duration(200).call(changeColor);
-      tooltip.transition().duration(200).style("opacity", 0.9);
+    // Tooltips
+    .on("mouseover", function (d) {
+      var diff = d.values[1].Value - d.values[0].Value
+      console.log(diff)
+      if ( 60 < d.values[1].Value ) {
+        d3.select(this).transition().duration(200).call(changeGreen);
+        tooltip.transition().duration(200).style("opacity", 0.9).style("background", "green").style("color", 'white');
+      } else if (20 <= diff && diff <= 40) {
+        d3.select(this).transition().duration(200).call(changeYellow);
+        tooltip.transition().duration(200).style("opacity", 0.9).style("background", "yellow").style("color", 'black');
+      } else {
+        d3.select(this).transition().duration(200).call(changeRed);
+        tooltip.transition().duration(200).style("opacity", 0.9).style("background", "red").style("color", 'white');
+      }
       tooltip
-        .html("City: " + d.values[0].Name)
+        .html(d.values[0].Name)
         .style("left", d3.event.pageX + "px")
         .style("top", d3.event.pageY + 28 + "px");
     })
-    .on("mouseout", function(d) {
+    .on("mouseout", function (d) {
       d3.select(this).transition().duration(200).call(colorDefault);
       tooltip.transition().duration(500).style("opacity", 0);
     });
