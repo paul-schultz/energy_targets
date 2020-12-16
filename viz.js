@@ -71,15 +71,15 @@ d3.csv("targets.csv", function (data) {
 
   // Color change functions
   function changeRed(selection) {
-    selection.attr("stroke", "red");
+    selection.attr("stroke", "#FC6042");
   }
 
   function changeYellow(selection) {
-    selection.attr("stroke", "yellow");
+    selection.attr("stroke", "#EEE657");
   }
 
   function changeGreen(selection) {
-    selection.attr("stroke", "green");
+    selection.attr("stroke", "#2CC990");
   }
 
   function colorDefault(selection) {
@@ -111,13 +111,13 @@ d3.csv("targets.csv", function (data) {
       console.log(diff)
       if ( 60 < d.values[1].Value ) {
         d3.select(this).transition().duration(200).call(changeGreen);
-        tooltip.transition().duration(200).style("opacity", 0.9).style("background", "green").style("color", 'white');
+        tooltip.transition().duration(200).style("opacity", 0.9).style("background", "#2CC990").style("color", 'white');
       } else if (20 <= diff && diff <= 40) {
         d3.select(this).transition().duration(200).call(changeYellow);
-        tooltip.transition().duration(200).style("opacity", 0.9).style("background", "yellow").style("color", 'black');
+        tooltip.transition().duration(200).style("opacity", 0.9).style("background", "#EEE657").style("color", '#222');
       } else {
         d3.select(this).transition().duration(200).call(changeRed);
-        tooltip.transition().duration(200).style("opacity", 0.9).style("background", "red").style("color", 'white');
+        tooltip.transition().duration(200).style("opacity", 0.9).style("background", "#FC6042").style("color", 'white');
       }
       tooltip
         .html(d.values[0].Name)
@@ -128,4 +128,6 @@ d3.csv("targets.csv", function (data) {
       d3.select(this).transition().duration(200).call(colorDefault);
       tooltip.transition().duration(500).style("opacity", 0);
     });
+
+    // Axis labels
 });
