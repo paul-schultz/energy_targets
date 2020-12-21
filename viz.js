@@ -19,7 +19,7 @@ var tooltip = d3
   .style("opacity", 0);
 
 //Read data
-d3.csv("targets.csv", function (data) {
+d3.csv("./data/targets.csv", function (data) {
   // group data
   var sumstat = d3
     .nest() // nest function allows to group the calculation per level of a factor
@@ -69,11 +69,11 @@ d3.csv("targets.csv", function (data) {
     .call(d3.axisRight(yRight));
 
   // Color change functions
-  function changeRed(selection) { selection.attr("stroke", "#FC6042"); }
+  function changeRed(selection) { selection.attr("stroke", "#EE6677"); }
 
-  function changeYellow(selection) { selection.attr("stroke", "#EEE657"); }
+  function changeYellow(selection) { selection.attr("stroke", "#CCBB44"); }
 
-  function changeGreen(selection) { selection.attr("stroke", "#2CC990"); }
+  function changeGreen(selection) { selection.attr("stroke", "#228833"); }
 
   function colorDefault(selection) { selection.attr("stroke", "#e4e4e4"); }
 
@@ -97,13 +97,13 @@ d3.csv("targets.csv", function (data) {
       var diff = d.values[1].Value - d.values[0].Value;
       if (60 < d.values[1].Value) {
         d3.select(this).transition().duration(200).call(changeGreen).attr("stroke-width", 5);
-        tooltip.transition().duration(200).style("opacity", 0.9).style("background", "#2CC990").style("color", "white");
+        tooltip.transition().duration(200).style("opacity", 0.9).style("background", "#228833").style("color", "white");
       } else if (20 <= diff && diff <= 40) {
         d3.select(this).transition().duration(200).call(changeYellow).attr("stroke-width", 5);
-        tooltip.transition().duration(200).style("opacity", 0.9).style("background", "#EEE657").style("color", "#222");
+        tooltip.transition().duration(200).style("opacity", 0.9).style("background", "#CCBB44").style("color", "#222");
       } else {
         d3.select(this).transition().duration(200).call(changeRed).attr("stroke-width", 5);
-        tooltip.transition().duration(200).style("opacity", 0.9).style("background", "#FC6042").style("color", "white");
+        tooltip.transition().duration(200).style("opacity", 0.9).style("background", "#EE6677").style("color", "white");
       }
       tooltip
         .html( d.values[0].Name + ": " + d.values[0].Value + "% to " + d.values[1].Value + "%" )
